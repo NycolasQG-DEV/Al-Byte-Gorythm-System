@@ -34,12 +34,6 @@ O robô opera com uma **arquitetura distribuída** de alto desempenho, separando
 * ⚡ **Custom Serial Parser (C++):** Para evitar atrasos no loop principal do hardware, foi construído um interpretador de comandos próprio do zero no Arduino, que fatia e executa os pacotes recebidos do Python sem depender de bibliotecas pesadas.
 
 <br>
-
-<div align="center">
-  <img src="robotOnStage.gif" alt="Demonstração do Robô em Ação" width="700" />
-  <p><i>O robô processando a visão computacional e atuando no ambiente.</i></p>
-</div>
-
 ---
 
 ## 🚀 Como Executar o Projeto
