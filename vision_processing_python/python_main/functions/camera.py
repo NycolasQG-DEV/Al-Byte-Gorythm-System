@@ -1,10 +1,16 @@
 import cv2
+import time
 
-#objeto da camera ( utilizado para captar valores da camera )
 class Camera:
-    def __init__(self, camera_index=2):#padrão 2
+    def __init__(self, camera_index=1):  # default is 2
         self.camera_index = camera_index
-        self.cap = cv2.VideoCapture(self.camera_index)
+        self.cap = cv2.VideoCapture(self.camera_index, cv2.CAP_DSHOW)  # if on Windows
+
+        if not self.cap.isOpened():
+            raise RuntimeError(f"Error: Could not open camera at index {self.camera_index}.")
+
+        time.sleep(2)  # Wait for the camera to initialize
+
         self.setup_window()
 
     def setup_window(self):
@@ -12,10 +18,16 @@ class Camera:
         cv2.setWindowProperty("Image", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     def get_frame(self):
-        success, img = self.cap.read()
-        if not success:
-            raise RuntimeError("Não foi possível capturar o frame da câmera.")
-        return cv2.flip(img, 1)
+        # Try up to 10 times to ensure the camera is "awake"
+        for attempt in range(10):
+            success, img = self.cap.read()
+            if success:
+                return cv2.flip(img, 1)
+            else:
+                print(f"[Camera] Attempt {attempt + 1}: failed to capture frame.")
+                time.sleep(0.3)
+
+        raise RuntimeError("Could not capture camera frame after several attempts.")
 
     def release(self):
         self.cap.release()

@@ -3,7 +3,7 @@ from cvzone.HandTrackingModule import HandDetector
 import math
 import config
 
-#instancia que tem como função Identificar os rostos
+# Instance responsible for detecting faces
 class FaceDetectorWrapper:
     def __init__(self):
         self.detector = FaceDetector(minDetectionCon=config.DETECTION_CONFIDENCE_THRESHOLD, modelSelection=1)
@@ -12,7 +12,7 @@ class FaceDetectorWrapper:
         img, bboxs = self.detector.findFaces(img, draw=False)
         return img, bboxs
 
-#instancia que tem como função detectar a mão e dedos
+# Instance responsible for detecting hands and fingers
 class HandDetectorWrapper:
     def __init__(self):
         self.detector = HandDetector(detectionCon=config.DETECTION_CONFIDENCE_THRESHOLD, maxHands=2)
@@ -23,11 +23,11 @@ class HandDetectorWrapper:
 
     def measure_distance_between_index_fingers(self, hands):
         if len(hands) == 2:
-            # Posição dos dedos indicadores das duas mãos
-            index1 = hands[0]['lmList'][8][:2]  # Dedo indicador da primeira mão
-            index2 = hands[1]['lmList'][8][:2]  # Dedo indicador da segunda mão
+            # Position of the index fingers of both hands
+            index1 = hands[0]['lmList'][8][:2]  # Index finger of the first hand
+            index2 = hands[1]['lmList'][8][:2]  # Index finger of the second hand
 
-            # Calcular a distância entre os dedos indicadores
+            # Calculate the distance between the index fingers
             distance = math.hypot(index2[0] - index1[0], index2[1] - index1[1])
             midpoint = ((index1[0] + index2[0]) // 2, (index1[1] + index2[1]) // 2)
 

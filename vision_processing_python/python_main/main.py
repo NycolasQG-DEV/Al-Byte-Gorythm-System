@@ -8,7 +8,7 @@ from functions.send_message import send_message
 from commands import * 
 
 #//==============================================================================================//
-#//  Al B. Gorithm -- code by Hortobots team 2024 
+#//  Al B. Gorithm -- code by Hortobots team 2024/2025
 #// 
 #//  * Nycolas Queiroz Gimenez     
 #//  * Tiago Ferreira Gregório
@@ -18,175 +18,195 @@ from commands import *
 #//==============================================================================================//
 motor_direito, motor_esquerdo = config.DIREITO, config.ESQUERDO
 
-#função para fazer a pausa para detecção de gestos com 2 mãos
+#function to pause for 2-hand gesture detection
 async def wait_both_hand_ok(finger_count_left_hand, finger_count_right_hand):
     while True:
         if len(config.FCOUNT) > 1:
             if config.FCOUNT[0] == finger_count_left_hand and config.FCOUNT[1] == finger_count_right_hand:
                 return
-        await asyncio.sleep(0.1)  # Espera não bloqueante
+        await asyncio.sleep(0.1)  # Non-blocking wait
 
-#função para fazer a pausa para detecção de gestos com 1 mão
+#function to pause for 1-hand gesture detection
 async def wait_single_hand_ok(finger_count):
     while True:
         if len(config.FCOUNT) > 0:
             if config.FCOUNT[0] == finger_count:
                 return
-        await asyncio.sleep(0.1)  # Espera não bloqueante
+        await asyncio.sleep(0.1)  # Non-blocking wait
 
 #//==============================================================================================//
-#//  Programação do script da apresentação
+#//  Presentation script programming
 #//==============================================================================================//
 
-#// -- programação ATO 1 //    
+#// -- ACT 1 programming //
 async def ato_1():
-    await asyncio.sleep(10) #Esperar 10 segundos
-    await wait_single_hand_ok(5) #Ler 5 dedos
-    config.ROBOT_EXPRESSION_INDEX = 2 #Expressão entediado
-    moveFwd(150,4) #Andar para frente
-    await asyncio.sleep(4.5) #Esperar 4,5 segundos 
-    config.ROBOT_EXPRESSION_INDEX = 5 #Olho esquerdo fechado e direito aberto
+    await asyncio.sleep(10) 
+    await wait_single_hand_ok(5) 
+    config.ROBOT_EXPRESSION_INDEX = 2 
+    moveFwd(150,4) 
+    await asyncio.sleep(4.5) 
+    config.ROBOT_EXPRESSION_INDEX = 5 
     play_audio('./main/audio_files/1.mp3')
-    await asyncio.sleep(3) #Esperar 3 segundos
-    servo(90) #Motor servo da camera em 90 graus
-    turnRight(255, 2) #Girar para direita
-    await asyncio.sleep(1) #Esperar 1 segundo
-    stopMove() #Parar motores
-    await asyncio.sleep(2) #Esperar 2 segundos
-    turnLeft(255) #Girar para esquerda
-    await asyncio.sleep(3) #Esperar 3 segundos
+    await asyncio.sleep(2.5) 
+    servo(90) 
+    config.ROBOT_EXPRESSION_INDEX = 3
+    turnRight(255, 2) 
+    await asyncio.sleep(2.5) 
+    stopMove() 
+    await asyncio.sleep(1.5) 
+    config.ROBOT_EXPRESSION_INDEX = 2
+    turnLeft(255) 
+    await asyncio.sleep(1.5) 
     return
 
-#//==============================================================================================//
-#// -- programação ATO 2 //
-#//==============================================================================================//
+#// -- ACT 2 programming //
 async def ato_2():
-    await wait_centralize_codey() #Centralizar com Codey
-    stopMove() #Parar motores
-    await asyncio.sleep(7) #Esperar 7 segundos
-    config.ROBOT_EXPRESSION_INDEX = 3 #Expressão brava
+    await wait_centralize_codey() 
+    stopMove() 
+    await asyncio.sleep(7) 
+    config.ROBOT_EXPRESSION_INDEX = 3 
     play_audio('./main/audio_files/2.mp3')
-    moveBwd(130,2.5) #Andar para trás
-    await asyncio.sleep(14) #Esperar 14 segundos
-    config.ROBOT_EXPRESSION_INDEX = 4 # Olho esquerdo aberto e direito fechado
-    turnRight(255,2) #Girar para a direita
+    moveBwd(140,2.5) 
+    await asyncio.sleep(3)
+    config.ROBOT_EXPRESSION_INDEX = 2
+    await asyncio.sleep(11) 
+    turnRight(255,2) 
     play_audio('./main/audio_files/3.mp3')
-    await asyncio.sleep(3) #Esperar 3 segundos
-    turnLeft(255) #Girar para a esquerda
-    config.ROBOT_EXPRESSION_INDEX = 3 #Expressão brava
-    await asyncio.sleep(1) #Esperar 1 segundo
-    await wait_centralize_codey() #Centralizar com Codey
-    await asyncio.sleep(16) #Esperar 16 segundos
+    config.ROBOT_EXPRESSION_INDEX = 4
+    await asyncio.sleep(3)
+    turnLeft(255) 
+    await asyncio.sleep(2.5)
+    await wait_centralize_codey()
+    config.ROBOT_EXPRESSION_INDEX = 2
+    await asyncio.sleep(3) 
+    config.ROBOT_EXPRESSION_INDEX = 3
+    await asyncio.sleep(10) 
     play_audio('./main/audio_files/4.mp3')
-    await asyncio.sleep(5) #Esperar 5 segundos
-    config.ROBOT_EXPRESSION_INDEX = 1 #Expressão neutra
-    moveBwd(130,5) #Andar para trás
-    await asyncio.sleep(8) #Esperar 8 segundos
+    await asyncio.sleep(5) 
+    config.ROBOT_EXPRESSION_INDEX = 1 
+    moveBwd(130,5) 
+    await asyncio.sleep(8) 
     return
 
-#//==============================================================================================//
-#// -- programação ATO 3 //
-#//==============================================================================================//
+#// -- ACT 3 programming //
 async def ato_3():
-    config.ROBOT_EXPRESSION_INDEX = 3 #Expressão brava
+    config.ROBOT_EXPRESSION_INDEX = 3 
     play_audio('./main/audio_files/5.mp3')
-    await asyncio.sleep(8) #Esperar 8 segundos
-    config.ROBOT_EXPRESSION_INDEX = 7 #Ponto e virgula
-    config.TRACKING = True; #Iniciar perseguição
-    await asyncio.sleep(3); #Esperar 3 segundos
-    await wait_stop_tracking(); #Esperar o robô parar de seguir
-    if config.FACE_CENTER_X < config.IMG_CENTER_X : #Verificar centralição do robô em relação ao Codey
-        turnLeft(255); #Girar para a esquerda         
-    elif config.FACE_CENTER_X > config.IMG_CENTER_X : #Verificar centralição do robô em relação ao Codey        
-        turnRight(255); #Girar para a direita
-    await wait_centralize_codey() #Centralizar com Codey
-    stopMove(); #Parar motores
-    await asyncio.sleep(2) #Esperar 2 segundos
-    config.ROBOT_EXPRESSION_INDEX = 3 #Expressão brava
+    await asyncio.sleep(8) 
+    config.ROBOT_EXPRESSION_INDEX = 7
+    config.TRACKING = True; 
+    await asyncio.sleep(3); 
+    await wait_stop_tracking(); 
+    if config.FACE_CENTER_X < config.IMG_CENTER_X :
+        turnLeft(255);         
+    elif config.FACE_CENTER_X > config.IMG_CENTER_X :      
+        turnRight(255); 
+    await asyncio.sleep(0.5)
+    await wait_centralize_codey() 
+    stopMove(); 
+    await asyncio.sleep(3) 
+    config.ROBOT_EXPRESSION_INDEX = 3 
     play_audio('./main/audio_files/6.mp3')
-    await asyncio.sleep(7) #Esperar 7 segundos
-    config.ROBOT_EXPRESSION_INDEX = 5 # Olho esquerdo fechado e direito aberto
+    await asyncio.sleep(8) 
+    config.ROBOT_EXPRESSION_INDEX = 5 
     play_audio('./main/audio_files/7.mp3')
-    await asyncio.sleep(12) #Esperar 12 segundos
-    moveBwd(150, 5) #Centralizar com Codey
+    await asyncio.sleep(1)
+    config.ROBOT_EXPRESSION_INDEX = 2
+    await asyncio.sleep(3)
+    moveBwd(150, 5) 
+    await asyncio.sleep(9) 
     return
 
-#//==============================================================================================//
-#// -- programação ATO 4 //
-#//==============================================================================================//
+#// -- ACT 4 programming //
 async def ato_4():
-    config.ROBOT_EXPRESSION_INDEX = 3 #Expressão brava
+    turnRight(255, 2)
+    config.ROBOT_EXPRESSION_INDEX = 3 
     play_audio('./main/audio_files/8.mp3')
-    await asyncio.sleep(15) #Esperar 15 segundos
+    await asyncio.sleep(4)
+    config.ROBOT_EXPRESSION_INDEX = 2
+    await asyncio.sleep(11) 
+    config.ROBOT_EXPRESSION_INDEX = 3
     play_audio('./main/audio_files/9.mp3')
-    await asyncio.sleep(4) #Esperar 4 segundos
-    config.ROBOT_EXPRESSION_INDEX = 1 #Expressão neutra
-    await asyncio.sleep(14) #Esperar 14 segundos
-    config.ROBOT_EXPRESSION_INDEX = 3 #Expressão brava
+    turnLeft(255) 
+    await asyncio.sleep(1);
+    await wait_centralize_codey() 
+    await asyncio.sleep(4) 
+    config.ROBOT_EXPRESSION_INDEX = 1 
+    await asyncio.sleep(8) 
+    config.ROBOT_EXPRESSION_INDEX = 6
     play_audio('./main/audio_files/10.mp3')
-    await asyncio.sleep(3) #Esperar 3 segundos
-    config.ROBOT_EXPRESSION_INDEX = 7 #Ponto e virgula
-    moveFwd(150, 3) #Andar para frente
-    await asyncio.sleep(5) #Esperar 5 segundos
-    await wait_both_hand_ok(5, 5) #Ler 5 dedos de ambas as mãos
+    await asyncio.sleep(1.8) 
+    config.ROBOT_EXPRESSION_INDEX = 3 
+    await asyncio.sleep(1.2) 
+    config.ROBOT_EXPRESSION_INDEX = 7 
+    moveFwd(150, 3) 
+    await wait_both_hand_ok(5, 5) 
+    turnRight(255, 2.6) 
+    await asyncio.sleep(2) 
     play_audio('./main/audio_files/erro.mp3')
-    config.ROBOT_EXPRESSION_INDEX = 8 #Tela azul
-    await asyncio.sleep(70) #Esperar 70 segundos = 1 minuto e 10 segundos
+    config.ROBOT_EXPRESSION_INDEX = 8 
+    await asyncio.sleep(65) 
     play_audio('./main/audio_files/start.mp3')
-    await asyncio.sleep(5) #Esperar 5 segundos
-    config.ROBOT_EXPRESSION_INDEX = 9 #Expressão Triste
-    config.EYE_COLOR = (255, 150, 150) #Olho ciano
-    turnRight(255, 2) #Girar para a direira
+    await asyncio.sleep(5) 
+    config.ROBOT_EXPRESSION_INDEX = 9 
+    config.EYE_COLOR = (255, 255, 0) 
+    turnLeft(255) 
+    await asyncio.sleep(1);
+    await wait_centralize_codey()
+    await asyncio.sleep(2)
+    config.ROBOT_EXPRESSION_INDEX = 1
     play_audio('./main/audio_files/11.mp3')
-    await asyncio.sleep(20) #Esperar 20 segundos
-    config.ROBOT_EXPRESSION_INDEX = 6 #Expressão Rindo
+    await asyncio.sleep(1) 
+    config.ROBOT_EXPRESSION_INDEX = 9
+    await asyncio.sleep(19) 
     play_audio('./main/audio_files/12.mp3')
-    await asyncio.sleep(1) #Esperar 1 segundo
-    config.ROBOT_EXPRESSION_INDEX = 1 #Expressão neutra
-    await asyncio.sleep(14) #Esperar 14 segundos
+    turnRight(255, 2) 
+    config.ROBOT_EXPRESSION_INDEX = 6
+    await asyncio.sleep(2) 
+    config.ROBOT_EXPRESSION_INDEX = 1 
+    await asyncio.sleep(14) 
     play_audio('./main/audio_files/erro.mp3')
-    config.ROBOT_EXPRESSION_INDEX = 3 #Expressão brava
-    config.EYE_COLOR = (255, 0, 255) #Olho roxo
-    await asyncio.sleep(3) #Esperar 3 segundos
-    config.ROBOT_EXPRESSION_INDEX = 1 #Expressão neutra
-    config.EYE_COLOR = (255, 150, 150) #Olho ciano
-    await asyncio.sleep(20) #Esperar 20 segundos
-    print('codigo finalizado!')
+    config.ROBOT_EXPRESSION_INDEX = 3 
+    config.EYE_COLOR = (255, 0, 255) 
+    await asyncio.sleep(3) 
+    config.ROBOT_EXPRESSION_INDEX = 1 
+    config.EYE_COLOR = (255, 255, 0) 
+    await asyncio.sleep(20) 
+    print('The code is finished!')
     return
 
 #//==============================================================================================//
-#// -- funções extras //
+#// -- extra functions //
 #//==============================================================================================//
 async def wait_stop_tracking():
-     while config.TRACKING:  # Verifica se config.TRACKING é True
-         await asyncio.sleep(0.1)  # Espera 100ms antes de verificar novamente
-     print("config.TRACKING mudou para False!")
+     while config.TRACKING:  # Check if config.TRACKING is True
+         await asyncio.sleep(0.1)  # Wait 100ms before checking again
+     print("config.TRACKING is False!")
 
 async def wait_centralize_codey():
-    while not config.CENTRALIZE_CODEY:  # Verifica se config.CENTRALIZE_CODEY é False
-        await asyncio.sleep(0.1)  # Espera 100ms antes de verificar novamente
-    stopMove(); #Parar motores
-    print("codey centralizado!")
+    while not config.CENTRALIZE_CODEY:  # Check if config.CENTRALIZE_CODEY is False
+        await asyncio.sleep(0.1)  # Wait 100ms before checking again
+    stopMove(); 
+    print("codey in the center!")
 
 
 
 #//==============================================================================================//
-#//  Função MAIN( principal ) do robô
+#//  Robot MAIN function
 #//==============================================================================================//
 
 async def main():
     # Inicia a thread do robô
-    servo(90)
+    adjustMotors(config.M1_ADJUST,config.M2_ADJUST,config.M3_ADJUST,config.M4_ADJUST) # Manual engine calibration
+    servo(100)#camera start calibration
     threading.Thread(target=robot_face_update, daemon=True).start()
     print('// -- Program Started! -- < Hello AL_Gorithm!  > -- ')
-    config.ROBOT_EXPRESSION_INDEX = 1 #Expressão neutra
+    config.ROBOT_EXPRESSION_INDEX = 1 
 
-    #await test()
-
-    await ato_1() #executa o ato 1
-    await ato_2() #executa o ato 2
-    await ato_3() #executa o ato 3
-    await ato_4() #executa o ato 4
+    await ato_1() 
+    await ato_2() 
+    await ato_3() 
+    await ato_4() 
 
 if __name__ == "__main__":
     asyncio.run(main())

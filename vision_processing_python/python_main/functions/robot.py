@@ -17,19 +17,20 @@ def robot_face_update():
     window_height = int(camera.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     eye_position = EyePosition(window_width, window_height)
 
-    # Iniciar threads para piscada e animação dos olhos
-    threading.Thread(target=blink_eyes, args=(eye_position,)).start()
-    threading.Thread(target=animate_eyes, args=(eye_position,)).start()
+    # Start threads for blinking and eye animation
+    threading.Thread(target=blink_eyes, args=(eye_position,), daemon=True).start()
+    threading.Thread(target=animate_eyes, args=(eye_position,), daemon=True).start()
 
-    # Variáveis de controle do servo
+    # Servo control variables
     last_servo_update = time.time()
-    smoothed_error_y = 0  # Armazena erro suavizado
+    smoothed_error_y = 0  # Stores smoothed error
+    last_servo_value = None  # Last value sent to the servo
 
     def stop_all():
         if not audio.pygame.mixer.get_init():
             audio.pygame.mixer.init()
         audio.pygame.mixer.music.stop()
-        stopMove();
+        stopMove()
         cv2.destroyAllWindows()
         os._exit(0)
 
@@ -61,66 +62,80 @@ def robot_face_update():
             config.IMG_CENTER_X = img_center_x
             config.IMG_CENTER_Y = img_center_y
 
-            # Parâmetros ajustados para mais velocidade e sensibilidade
-            Kp_min = 0.05  # Aumentado
-            Kp_max = 0.25  # Aumentado para resposta mais forte quando o rosto está próximo
+            # Parameters adjusted for more speed and sensitivity
+            Kp_min = 0.05
+            Kp_max = 0.25
             area_max = 10000
-            servo_delay = 0.05  # Menor atraso para resposta mais rápida
-            alpha = 0.5  # Suavização um pouco menor para responder mais rápido
+            servo_delay = 0.05
+            alpha = 0.5
 
-            # Cálculo do erro
+            # Error calculation
             error_y = face_center_y - img_center_y
-
-            # Inicialize smoothed_error_y = 0 antes do loop principal
             smoothed_error_y = alpha * error_y + (1 - alpha) * smoothed_error_y
 
-            # Cálculo do ganho proporcional com base na área
             area = w * h
             normalized_area = min(area / area_max, 1.0)
             Kp = Kp_min + (Kp_max - Kp_min) * normalized_area
 
-            # Cálculo do ajuste do servo (delta)
             delta = int(Kp * smoothed_error_y)
-
-            # Aumentar limite de delta para permitir movimentos maiores se necessário
             delta = max(-6, min(6, delta))
 
-            # Menor zona morta (mais sensível ao centro)
             current_time = time.time()
             if abs(smoothed_error_y) > 5 and abs(delta) >= 1 and (current_time - last_servo_update) > servo_delay:
-                config._SERVO = max(75, min(100, config._SERVO + delta))
-                servo(config._SERVO)
-                last_servo_update = current_time
+                new_servo_value = max(85, min(110, config._SERVO + delta))
+                if new_servo_value != last_servo_value:
+                    config._SERVO = new_servo_value
+                    servo(config._SERVO)
+                    last_servo_value = config._SERVO
+                    last_servo_update = current_time
 
-
-            # Controle dos motores baseado na horizontal
+            # Motor control based on horizontal position
             if abs(face_center_x - img_center_x) < 200 and w * h >= 2000:
                 config.CENTRALIZE_CODEY = True
             else:
                 config.CENTRALIZE_CODEY = False
 
             if config.TRACKING:
-                                # Suavização horizontal
                 error_x = face_center_x - img_center_x
                 smoothed_error_x = 0.5 * error_x + 0.5 * getattr(config, "SMOOTHED_ERROR_X", 0)
-                config.SMOOTHED_ERROR_X = smoothed_error_x  # salva no config para manter o histórico
+                config.SMOOTHED_ERROR_X = smoothed_error_x
 
-                movement_delay = 0.15  # Delay maior para suavidade
+                movement_delay = 0.15
                 movement_last = getattr(config, "LAST_MOVEMENT_TIME", 0)
 
-                if config.TRACKING and (time.time() - movement_last) > movement_delay:
+                if (time.time() - movement_last) > movement_delay:
                     moved = False
-                    if smoothed_error_x < -60:
-                        print('Rosto à esquerda - Movendo para direita suavemente')
-                        moveRight(120)
+                    abs_error = abs(smoothed_error_x)
+
+                    def dynamic_speed(error, max_speed=150, min_speed=80, max_error=150):
+                        error = abs(error)
+                        if error > max_error:
+                            return max_speed
+                        speed = int(min_speed + (max_speed - min_speed) * (error / max_error))
+                        return min(speed, max_speed)
+
+                    speed = dynamic_speed(smoothed_error_x)
+
+                    if smoothed_error_x < -120:
+                        print(f'Large error to the left - Turning right (turnRight)')
+                        turnLeft(240)
                         moved = True
-                    elif smoothed_error_x > 60:
-                        print('Rosto à direita - Movendo para esquerda suavemente')
-                        moveLeft(120)
+                    elif smoothed_error_x > 120:
+                        print(f'Large error to the right - Turning left (turnLeft)')
+                        turnRight(240)
                         moved = True
-                    elif abs(smoothed_error_x) < 40:
-                        print('Rosto centralizado - Movendo para frente suavemente')
-                        moveFwd(150)
+                    elif smoothed_error_x < -70:
+                        print(f'Medium error to the left - Moving right (moveRight) with speed {speed}')
+                        moveRight(speed)
+                        moved = True
+                    elif smoothed_error_x > 70:
+                        print(f'Medium error to the right - Moving left (moveLeft) with speed {speed}')
+                        moveLeft(speed)
+                        moved = True
+                    elif abs_error < 80:
+                        forward_speed = 140
+                        print(f'Face centered - Moving forward with speed {forward_speed}')
+                        moveFwd(forward_speed)
                         moved = True
 
                     if moved:
@@ -128,13 +143,11 @@ def robot_face_update():
                     else:
                         stopMove()
 
-                # Quando muito próximo, parar com suavidade
                 if w * h >= 12000:
-                    print("Rosto muito próximo - parando com suavidade")
+                    print("Face too close - Stopping smoothly")
                     stopMove()
-                    time.sleep(0.2)  # pequeno delay para evitar repetição
+                    time.sleep(0.2)
                     config.TRACKING = False
-
 
         eye_position.draw(img)
 
