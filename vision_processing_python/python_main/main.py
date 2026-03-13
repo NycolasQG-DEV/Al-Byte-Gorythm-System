@@ -10,10 +10,10 @@ from commands import *
 #//==============================================================================================//
 #//  Al B. Gorithm -- code by Hortobots team 2024/2025
 #// 
-#//  * Nycolas Queiroz Gimenez     
-#//  * Tiago Ferreira Gregório
-#//  * Luiz Otavio Siqueira
-#//  * Nicolas Paiva Medeiros                          
+#//  * Nycolas Queiroz Gimenez ( DEV )
+#//  * Tiago Ferreira Gregório ( Screen Writer )
+#//  * Luiz Otavio Siqueira ( Mechanical )
+#//  * Nicolas Paiva Medeiros ( Scene Dsigner )              
 #//                         
 #//==============================================================================================//
 motor_direito, motor_esquerdo = config.DIREITO, config.ESQUERDO

@@ -1,5 +1,4 @@
 import serial
-
 #//==============================================================================================//
 #//  Variable configuration script and global definitions.
 #//==============================================================================================//
@@ -14,7 +13,16 @@ M4_ADJUST = 0
 SHOW_CAMERA = False  # default is False
 
 #// Other settings
-DEBUG_MODE = False   # default is False
+DEBUG_MODE = True   # default is False
+
+
+
+# //=================================================================
+# IF YOU WANT TO SWITCH THE CAMERA, go to :
+# "/functions/camera.py" and switch de var CAMERA to 0, 1, ...
+# //=================================================================
+
+
 
 PORT = "COM20"
 DETECTION_CONFIDENCE_THRESHOLD = 0.2

@@ -1,8 +1,13 @@
 import cv2
 import time
 
+# //=================================================================
+# camera index
+CAMERA = 0;
+# //=================================================================
+
 class Camera:
-    def __init__(self, camera_index=1):  # default is 2
+    def __init__(self, camera_index=CAMERA):  # default is 2 ( switch if you need )
         self.camera_index = camera_index
         self.cap = cv2.VideoCapture(self.camera_index, cv2.CAP_DSHOW)  # if on Windows
 
