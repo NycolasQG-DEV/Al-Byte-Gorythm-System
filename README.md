@@ -1,4 +1,4 @@
-<h1 align="center">🤖 AI-Byte-Gorythm System | RoboCup 2025</h1>
+<h1 align="center">AI-Byte-Gorythm System | RoboCup 2025</h1>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
@@ -7,79 +7,79 @@
   <img src="https://img.shields.io/badge/Arduino_Mega-00979D?style=for-the-badge&logo=arduino&logoColor=white" alt="Arduino Mega" />
 </p>
 
-> **Repositório oficial do sistema integrado de Visão Computacional, Inteligência Artificial e Controle Embarcado** do robô **AI-Byte-Gorythm** (Campeão Nacional da OBR 2024 e Destaque no Mundial da RoboCup 2025).
+> **Official repository for the integrated Computer Vision, Artificial Intelligence, and Embedded Control system** of the robot **AI-Byte-Gorythm** (OBR 2024 National Champion and RoboCup 2025 World Highlight).
 
 ---
 
 <div align="center">
-  <img src="thumb.jpg" alt="Foto do Robô AI-Byte-Gorythm" width="600" />
+  <img src="thumb.jpg" alt="AI-Byte-Gorythm Robot Photo" width="600" />
 </div>
 
 ---
 
-## 🧠 Arquitetura do Sistema
+## System Architecture
 
-O robô opera com uma **arquitetura distribuída** de alto desempenho, separando a inteligência da atuação física:
+The robot operates using a **high-performance distributed architecture**, separating intelligence from physical actuation:
 
-* 👁️ **O Cérebro (Python + OpenCV):** Executado no computador principal. Processa matrizes de imagem da câmera em tempo real para detectar rostos, reconhecer gestos (contagem de dedos via `cvzone`/`MediaPipe`), gerenciar a engine gráfica dos olhos na tela e calcular a lógica de movimentação.
-* 🦾 **Os Músculos (C++ + Arduino Mega):** Atua estritamente como *hardware driver*. Recebe pacotes de comandos assíncronos via Serial (ex: `move_Fwd 150`, `servo 90`), decodifica as *strings* usando um parser customizado super leve, e converte as ordens em sinais PWM para os controladores de motor (Ponte H) em um sistema de tração 4WD.
+* **The Brain (Python + OpenCV):** Runs on the main computer. It processes real-time camera image frames to detect faces, recognize gestures (finger counting via `cvzone`/`MediaPipe`), manage the eye graphics engine on the display, and compute movement logic.
+* **The Muscles (C++ + Arduino Mega):** Acts strictly as a *hardware driver*. It receives asynchronous command packets via Serial (e.g., `move_Fwd 150`, `servo 90`), decodes the strings using a custom lightweight parser, and converts instructions into PWM signals for motor controllers (H-Bridge) in a 4WD traction system.
 
 ---
 
-## ⚙️ Funcionalidades Principais
+## Main Features
 
-* 🎯 **Rastreamento Facial Automático (Face Tracking):** O robô identifica rostos no palco e calcula o erro de posicionamento (X e Y) em pixels, convertendo o desvio em correções automáticas de giro e aproximação.
-* ✋ **Reconhecimento de Gestos (Hand Tracking):** Mapeamento de *landmarks* das mãos em tempo real. O robô conta os dedos do usuário e mede distâncias para disparar comandos lógicos da apresentação teatral.
-* 🎭 **Expressões Faciais Dinâmicas e Áudio:** Motor gráfico integrado (`pygame`) que reage ao ambiente. Os olhos piscam, mudam de cor, demonstram emoções e sincronizam com arquivos de vídeo/áudio predefinidos.
-* ⚡ **Custom Serial Parser (C++):** Para evitar atrasos no loop principal do hardware, foi construído um interpretador de comandos próprio do zero no Arduino, que fatia e executa os pacotes recebidos do Python sem depender de bibliotecas pesadas.
+* **Automatic Face Tracking:** The robot detects faces on stage and calculates positioning error (X and Y in pixels), converting deviation into automatic rotation and forward/backward adjustments.
+* **Hand Gesture Recognition:** Real-time hand landmark mapping. The robot counts the user’s fingers and measures distances to trigger logical commands during the performance.
+* **Dynamic Facial Expressions and Audio:** Integrated graphics engine (`pygame`) that reacts to the environment. The eyes blink, change color, display emotions, and synchronize with predefined video/audio files.
+* **Custom Serial Parser (C++):** To avoid delays in the hardware main loop, a custom command interpreter was built from scratch on the Arduino. It slices and executes incoming Python packets without relying on heavy libraries.
 
 <br>
 ---
 
-## 🚀 Como Executar o Projeto
+## How to Run the Project
 
-### 1. Requisitos de Hardware
-* 1 Computador (PC/Notebook/Mini-PC)
-* 1 Webcam conectada ao PC
-* 1 Arduino Mega conectado via USB ao PC
-* 4 Motores DC com Drivers Ponte H e 1 Servomotor
+### 1. Hardware Requirements
+* 1 Computer (PC/Notebook/Mini-PC)
+* 1 Webcam connected to the PC
+* 1 Arduino Mega connected via USB
+* 4 DC Motors with H-Bridge drivers and 1 Servo motor
 
-### 2. Preparando os Músculos (C++)
-1. Abra o arquivo `AlCode21_05_2025.ino` na Arduino IDE.
-2. Selecione a placa **Arduino Mega** e a porta correspondente.
-3. Faça o upload. O Arduino ficará em modo de escuta.
+### 2. Setting Up the Muscles (C++)
+1. Open the file `AlCode21_05_2025.ino` in the Arduino IDE.
+2. Select the **Arduino Mega** board and the correct port.
+3. Upload the code. The Arduino will enter listening mode.
 
-### 3. Preparando o Cérebro (Python)
-Certifique-se de ter o Python 3.10+ instalado. Instale as dependências executando o comando abaixo no seu terminal:
+### 3. Setting Up the Brain (Python)
+Make sure you have Python 3.10+ installed. Install dependencies by running:
 
     pip install opencv-python cvzone mediapipe pygame pyserial moviepy numpy
 
-### 4. Ajustes de Configuração (`config.py`)
-Antes de executar, revise as variáveis globais no arquivo `config.py`:
-* `PORT = "COM20"` ➔ Atualize para a porta USB onde seu Arduino está conectado.
-* `DEBUG_MODE = True` ➔ Ative caso queira rodar o código apenas em software, sem enviar dados para a porta Serial (evita erros de compilação se o robô físico não estiver conectado).
-* `PARA TROCAR A CAMERA` ➔ Acesse o arquivo `/functions/camera` e troque a variavel `CAMERA` para o index desejado (padrão 0).
+### 4. Configuration (`config.py`)
+Before running, review the global variables in `config.py`:
+* `PORT = "COM20"` → Update to the USB port where your Arduino is connected.
+* `DEBUG_MODE = True` → Enable this if you want to run the system in software-only mode (prevents errors when the physical robot is not connected).
+* To change the camera → Go to `/functions/camera` and update the `CAMERA` variable (default is 0).
 
-### 5. Start!
-Com o ambiente pronto, inicie o sistema executando na raiz do projeto:
+### 5. Start
+With everything set up, run from the project root:
 
     python main.py
 
 ---
 
-## 🖧 Protocolo de Comunicação (Serial)
+## Communication Protocol (Serial)
 
-A ponte entre o Python e o C++ ocorre via *strings* separadas por espaço. Principais comandos suportados pelo Arduino:
+Communication between Python and C++ is handled via space-separated strings. Main commands supported by the Arduino:
 
-| Comando | Parâmetros | Descrição |
-| :--- | :--- | :--- |
-| `adjustMotors` | `[m1] [m2] [m3] [m4]` | Calibra a potência base individual dos 4 motores. |
-| `move_Fwd` | `[velocidade] [tempo]` | Move o robô para frente aplicando o PWM calibrado. |
-| `servo` | `[angulo]` | Ajusta a inclinação da câmera/cabeça. |
-| `stop` | `N/A` | *Kill switch*. Corta a energia de todos os motores imediatamente. |
+| Command        | Parameters              | Description |
+|----------------|------------------------|-------------|
+| `adjustMotors` | `[m1] [m2] [m3] [m4]`  | Calibrates base power for each of the 4 motors |
+| `move_Fwd`     | `[speed] [time]`       | Moves the robot forward using calibrated PWM |
+| `servo`        | `[angle]`              | Adjusts camera/head tilt |
+| `stop`         | N/A                    | Kill switch. Immediately stops all motors |
 
 ---
 
 <div align="center">
-  <i>Desenvolvido por Nycolas Queiroz Gimenez para a Equipe de robótica SESI Hortobots.</i>
+  <i>Developed by Nycolas Queiroz Gimenez for the SESI Hortobots robotics team.</i>
 </div>
